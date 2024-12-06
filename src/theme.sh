@@ -16,23 +16,25 @@ main() {
     ### Load Options
     transparent=$(get_tmux_option "@mountain_theme_transparent_bg" "true")
 
-    border_style_active_pane=$(get_tmux_option "@theme_active_pane_border_style" "${PALLETE[bg]}")
-    border_style_inactive_pane=$(get_tmux_option "@theme_inactive_pane_border_style" "${PALLETE[bg]}")
+    border_style_active_pane=$(get_tmux_option "@mountain_theme_active_pane_border_style" "${PALLETE[bg]}")
+    border_style_inactive_pane=$(get_tmux_option "@mountain_theme_inactive_pane_border_style" "${PALLETE[bg]}")
 
-    session_icon=$(get_tmux_option "@theme_session_icon" "")
-    active_window_icon=$(get_tmux_option "@theme_plugin_active_window_icon" " ")
-    inactive_window_icon=$(get_tmux_option "@theme_plugin_inactive_window_icon" " ")
-    zoomed_window_icon=$(get_tmux_option "@theme_plugin_zoomed_window_icon" " ")
-    pane_synchronized_icon=$(get_tmux_option "@theme_plugin_pane_synchronized_icon" "✵")
+    session_icon=$(get_tmux_option "@mountain_theme_session_icon" "")
+    active_window_icon=$(get_tmux_option "@mountain_theme_plugin_active_window_icon" " ")
+    inactive_window_icon=$(get_tmux_option "@mountain_theme_plugin_inactive_window_icon" " ")
+    zoomed_window_icon=$(get_tmux_option "@mountain_theme_plugin_zoomed_window_icon" " ")
+    pane_synchronized_icon=$(get_tmux_option "@mountain_theme_plugin_pane_synchronized_icon" "✵")
 
-    active_window_title=$(get_tmux_option "@theme_active_window_title" "#W ")
-    inactive_window_title=$(get_tmux_option "@theme_inactive_window_title" "#W ")
+    active_window_title=$(get_tmux_option "@mountain_theme_active_window_title" "#W ")
+    inactive_window_title=$(get_tmux_option "@mountain_theme_inactive_window_title" "#W ")
 
-    left_separator=$(get_tmux_option "@theme_left_separator" '')
-    right_separator=$(get_tmux_option "@theme_right_separator" '')
+    left_separator=$(get_tmux_option "@mountain_theme_left_separator" '')
+    right_separator=$(get_tmux_option "@mountain_theme_right_separator" '')
+
+    IFS=',' read -ra status_options <<<"$(get_tmux_option "@mountain_status_options", "user")"
 
     if [ "$transparent" = "true" ]; then
-        right_separator_inverse=$(get_tmux_option "@theme_transparent_right_separator_inverse", '')
+        right_separator_inverse=$(get_tmux_option "@mountain_theme_transparent_right_separator_inverse", '')
     fi
 
     tmux set-option -g status-left-length 100
@@ -60,6 +62,51 @@ main() {
 
     ### Right side
     tmux set-option -g status-right ""
+
+    for option in "${status_options[@]}"; do
+
+        if [ ! -f "${current_dir}/status/${option}.sh" ]; then
+            # TODO: Update logic to handle user created statuses
+            # if no option is available, then do nothing for now
+            #
+            # tmux set-option -ga status-right "${option}"
+            echo "${option}"
+        else
+
+            status_script_path="${current_dir}/status/${option}.sh"
+            # plugin_execution_string="$(${plugin_script_path})"
+
+            # shellcheck source=src/status/user.sh
+            . "$status_script_path"
+
+            icon_var="status_${option}_icon"
+            accent_color_var="status_${option}_accent_color"
+            icon_color_var="status_${option}_icon_color"
+            text_var="status_${option}_text"
+
+            status_icon="${!icon_var}"
+            accent_color="${PALLETE["${!accent_color_var}"]}"
+            icon_color="${PALLETE["${!icon_color_var}"]}"
+            status_text="${!text_var}"
+
+            echo ${accent_color}
+
+            separator_icon_start="#[fg=${icon_color},bg=default]${right_separator}#[none]"
+            separator_icon_end="#[fg=${accent_color},bg=${icon_color}]${right_separator}#[none]"
+            separator_end="#[fg=${accent_color},bg=default]${right_separator_inverse}#[none]"
+
+            plugin_output_string=""
+
+            plugin_output="#[fg=${PALLETE[fg]},bg=${accent_color}]${status_text}#[none]"
+            plugin_icon_output="${separator_icon_start}#[fg=${PALLETE[fg]},bg=${icon_color}]${status_icon}${separator_icon_end}"
+            plugin_output_string="${plugin_icon_output}${plugin_output} "
+
+            tmux set-option -ga status-right "$plugin_output_string"
+
+        fi
+    done
+
+    tmux set-window-option -g window-status-separator ''
 }
 
 # run main function
