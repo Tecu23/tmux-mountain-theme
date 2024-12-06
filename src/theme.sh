@@ -31,7 +31,7 @@ main() {
     left_separator=$(get_tmux_option "@mountain_theme_left_separator" '')
     right_separator=$(get_tmux_option "@mountain_theme_right_separator" '')
 
-    IFS=',' read -ra status_options <<<"$(get_tmux_option "@mountain_status_options", "user")"
+    IFS=',' read -ra status_options <<<"$(get_tmux_option "@mountain_status_options", "battery")"
 
     if [ "$transparent" = "true" ]; then
         right_separator_inverse=$(get_tmux_option "@mountain_theme_transparent_right_separator_inverse", '')
@@ -58,10 +58,13 @@ main() {
     tmux set-window-option -g window-status-current-format "$(generate_window_string "$active_window_icon" "$zoomed_window_icon" "$pane_synchronized_icon" "$left_separator" "$transparent" "$active_window_title" "${PALLETE[bright_cyan]}" "${PALLETE[normal_cyan]}" "${PALLETE[normal_black]}" "${PALLETE[bg]}")"
 
     ### Create Inactive Window Pane
-    tmux set-window-option -g window-status-format "$(generate_window_string "$inactive_window_icon" "$zoomed_window_icon" "$pane_synchronized_icon" "$left_separator" "$transparent" "$inactive_window_title" "${PALLETE[bright_black]}" "${PALLETE[normal_black]}" "${PALLETE[fg]}" "${PALLETE[bg]}")"
+    tmux set-window-option -g window-status-format "$(generate_window_string "$inactive_window_icon" "$zoomed_window_icon" "$pane_synchronized_icon" "$left_separator" "$transparent" "$inactive_window_title" "${PALLETE[bright_black]}" "${PALLETE[normal_black]}" "${PALLETE[bright_white]}" "${PALLETE[bg]}")"
 
     ### Right side
     tmux set-option -g status-right ""
+
+    last_module="${status_options[-1]}"
+    is_last_module=0
 
     for option in "${status_options[@]}"; do
 
@@ -72,6 +75,10 @@ main() {
             # tmux set-option -ga status-right "${option}"
             echo "${option}"
         else
+
+            if [ "$option" == "$last_module" ]; then
+                is_last_module=1
+            fi
 
             status_script_path="${current_dir}/status/${option}.sh"
             # plugin_execution_string="$(${plugin_script_path})"
@@ -97,9 +104,14 @@ main() {
 
             plugin_output_string=""
 
-            plugin_output="#[fg=${PALLETE[fg]},bg=${accent_color}]${status_text}#[none]"
-            plugin_icon_output="${separator_icon_start}#[fg=${PALLETE[fg]},bg=${icon_color}]${status_icon}${separator_icon_end}"
-            plugin_output_string="${plugin_icon_output}${plugin_output} "
+            plugin_output="#[fg=${PALLETE[normal_black]},bg=${accent_color}]${status_text}#[none]"
+            plugin_icon_output="${separator_icon_start}#[fg=${PALLETE[normal_black]},bg=${icon_color}]${status_icon}${separator_icon_end}"
+
+            if [ ! $is_last_module -eq 1 ]; then
+                plugin_output_string="${plugin_icon_output}${plugin_output} ${separator_end}"
+            else
+                plugin_output_string="${plugin_icon_output}${plugin_output} "
+            fi
 
             tmux set-option -ga status-right "$plugin_output_string"
 
