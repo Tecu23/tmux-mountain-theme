@@ -11,3 +11,69 @@ get_tmux_option() {
         echo "$option_value"
     fi
 }
+
+# Function: generate_session_string()
+# Description:
+#   creates the session string for the tmux status bar
+#
+# Parameters:
+#   $1 (string) - the session icon
+#   $2 (string) - the left separator
+#   $3 (string) - whether the background is transparent or not
+#   $4 (string) - background color for client prefix
+#   $5 (string) - default background color
+#   $6 (string) - foreground color
+#
+# Output:
+#   - return: the session string
+generate_session_string() {
+    local session_icon="$1"
+    local left_separator="$2"
+
+    if [ "$transparent" = "true" ]; then
+        local separator_end="#[bg=default]#{?client_prefix,#[fg=$4],#[fg=$5]}${left_separator:?}#[none]"
+    else
+        local separator_end="#[bg=default]#{?client_prefix,#[fg=$4],#[fg=$5]}${left_separator:?}#[none]"
+    fi
+
+    echo "#[fg=$9,bold]#{?client_prefix,#[bg=$4],#[bg=$5]} ${session_icon} #S ${separator_end}"
+}
+
+# Function: generate_window_string()
+# Description:
+#   creates the window string (either active / inactive) string for the tmux status bar
+#
+# Parameters:
+#   $1 (string) - window icon
+#   $2 (string) - zoomed window icon
+#   $3 (string) - synchronized pane icon
+#   $4 (string) - the left separator
+#   $5 (string) - whether the background is transparent or not
+#   $6 (string) - the window text formatting
+#   $7 (string) - number background color
+#   $8 (string) - text background color
+#   $9 (string) - text foreground color
+#   $10 (string) - background color (when non-transparent)
+#
+# Output:
+#   - return: the session string
+generate_window_string() {
+    left_separator=$4
+    transparent=$5
+    active_window_title=$6
+
+    if [ "$transparent" = "true" ]; then
+        left_separator_inverse=$(get_tmux_option "@theme_transparent_left_separator_inverse" '')
+
+        separator_start="#[bg=default,fg=$7]${left_separator_inverse}#[bg=$7,fg=$9]"
+
+        separator_internal="#[bg=$8,fg=$7]${left_separator:?}#[none]"
+        separator_end="#[bg=default,fg=$8]${left_separator:?}#[none]"
+    else
+        separator_start="#[bg=$8,fg=${10}]${left_separator:?}#[none]"
+        separator_internal="#[bg=$8,fg=$7]${left_separator:?}#[none]"
+        separator_end="#[bg=${10},fg=$8]${left_separator:?}#[none]"
+    fi
+
+    echo "${separator_start}#[fg=$9]#I${separator_internal}#[fg=${9}] #{?window_zoomed_flag,$2,$1}${active_window_title}#{?pane_synchronized,$3,}${separator_end}#[none]"
+}
