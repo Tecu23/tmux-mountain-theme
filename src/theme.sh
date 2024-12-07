@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # TODO: Make transparent background setting work
-# TODO:
+# TODO: Add reverse icon logic
 
 # setting the locale, some users have issues with different locales, this enforces the correct one
 export LC_ALL=en_US.UTF-8
