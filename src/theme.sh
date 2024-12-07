@@ -28,17 +28,22 @@ main() {
     active_window_title=$(get_tmux_option "@mountain_theme_active_window_title" "#W ")
     inactive_window_title=$(get_tmux_option "@mountain_theme_inactive_window_title" "#W ")
 
-    left_separator=$(get_tmux_option "@mountain_theme_left_separator" '')
-    right_separator=$(get_tmux_option "@mountain_theme_right_separator" '')
+    left_separator=$(get_tmux_option "@mountain_theme_left_separator" ' ')    # '' ""
+    middle_separator=$(get_tmux_option "@mountain_theme_middle_separator" '█') #
+    right_separator=$(get_tmux_option "@mountain_theme_right_separator" "")   # ''thee
 
-    IFS=',' read -ra status_options <<<"$(get_tmux_option "@mountain_status_options", "battery,cpu")"
+    IFS=',' read -ra status_options <<<"$(get_tmux_option "@mountain_status_options", "battery,cpu,director")"
 
     if [ "$transparent" = "true" ]; then
-        right_separator_inverse=$(get_tmux_option "@mountain_theme_transparent_right_separator_inverse", '')
+        right_separator_inverse=$(get_tmux_option "@mountain_theme_transparent_right_separator_inverse" " ") # ''
     fi
 
     tmux set-option -g status-left-length 100
     tmux set-option -g status-right-length 100
+
+    # messages
+    tmux set-option -gq message-style "fg=${PALLETE[fg]},bg=default,align=centre"
+    tmux set-option -gq message-command-style "fg=${PALLETE[fg]},bg=default,align=centre"
 
     ### status bar
     status_bar_bg=${PALLETE[bg]}
@@ -52,19 +57,16 @@ main() {
     tmux set-option -g pane-border-style "#{?pane_synchronized,fg=$border_style_active_pane,fg=$border_style_inactive_pane}"
 
     ### Create Session String
-    tmux set-option -g status-left "$(generate_session_string "$session_icon" "$left_separator" "$transparent" "${PALLETE[bright_red]}" "${PALLETE[bright_green]}")"
+    tmux set-option -g status-left "$(generate_session_string "$session_icon" "$left_separator" "$right_separator" "$transparent" "${PALLETE[bright_red]}" "${PALLETE[bright_green]}" "${PALLETE[normal_black]}")"
 
     ### Create Active Window Pane
-    tmux set-window-option -g window-status-current-format "$(generate_window_string "$active_window_icon" "$zoomed_window_icon" "$pane_synchronized_icon" "$left_separator" "$transparent" "$active_window_title" "${PALLETE[bright_cyan]}" "${PALLETE[normal_cyan]}" "${PALLETE[normal_black]}" "${PALLETE[bg]}")"
+    tmux set-window-option -g window-status-current-format "$(generate_window_string "$active_window_icon" "$zoomed_window_icon" "$pane_synchronized_icon" "$left_separator" "$middle_separator" "$right_separator" "$transparent" "$active_window_title" "${PALLETE[bright_cyan]}" "${PALLETE[normal_cyan]}" "${PALLETE[normal_black]}" "${PALLETE[bg]}")"
 
     ### Create Inactive Window Pane
-    tmux set-window-option -g window-status-format "$(generate_window_string "$inactive_window_icon" "$zoomed_window_icon" "$pane_synchronized_icon" "$left_separator" "$transparent" "$inactive_window_title" "${PALLETE[bright_black]}" "${PALLETE[normal_black]}" "${PALLETE[bright_white]}" "${PALLETE[bg]}")"
+    tmux set-window-option -g window-status-format "$(generate_window_string "$inactive_window_icon" "$zoomed_window_icon" "$pane_synchronized_icon" "$left_separator" "$middle_separator" "$right_separator" "$transparent" "$inactive_window_title" "${PALLETE[bright_black]}" "${PALLETE[normal_black]}" "${PALLETE[bright_white]}" "${PALLETE[bg]}")"
 
     ### Right side
     tmux set-option -g status-right ""
-
-    last_module="${status_options[-1]}"
-    is_last_module=0
 
     for option in "${status_options[@]}"; do
 
@@ -76,12 +78,7 @@ main() {
             echo "${option}"
         else
 
-            if [ "$option" == "$last_module" ]; then
-                is_last_module=1
-            fi
-
             status_script_path="${current_dir}/status/${option}.sh"
-            # plugin_execution_string="$(${plugin_script_path})"
 
             # shellcheck source=src/status/user.sh
             . "$status_script_path"
@@ -96,20 +93,16 @@ main() {
             icon_color="${PALLETE["${!icon_color_var}"]}"
             status_text="${!text_var}"
 
-            separator_icon_start="#[fg=${icon_color},bg=default]${right_separator}#[none]"
-            separator_icon_end="#[fg=${accent_color},bg=${icon_color}]${right_separator}#[none]"
-            separator_end="#[fg=${accent_color},bg=default]${right_separator_inverse}#[none]"
+            separator_icon_start="#[fg=${icon_color},bg=default]${left_separator}#[none]"
+            separator_icon_end="#[fg=${accent_color},bg=${icon_color}]${middle_separator}#[none]"
+            separator_end="#[fg=${accent_color},bg=default]${right_separator}#[none]"
 
             plugin_output_string=""
 
             plugin_output="#[fg=${PALLETE[normal_black]},bg=${accent_color}]${status_text}#[none]"
             plugin_icon_output="${separator_icon_start}#[fg=${PALLETE[normal_black]},bg=${icon_color}]${status_icon}${separator_icon_end}"
 
-            if [ ! $is_last_module -eq 1 ]; then
-                plugin_output_string="${plugin_icon_output}${plugin_output} ${separator_end}"
-            else
-                plugin_output_string="${plugin_icon_output}${plugin_output} "
-            fi
+            plugin_output_string="${plugin_icon_output}${plugin_output} ${separator_end}"
 
             tmux set-option -ga status-right "$plugin_output_string"
 
