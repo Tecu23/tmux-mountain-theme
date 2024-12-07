@@ -35,7 +35,7 @@ main() {
     middle_separator=$(get_tmux_option "@mountain_theme_middle_separator" '█') #
     right_separator=$(get_tmux_option "@mountain_theme_right_separator" "")   # ''thee
 
-    IFS=',' read -ra status_options <<<"$(get_tmux_option "@mountain_theme_status_options", "battery,cpu,weather")"
+    IFS=',' read -ra status_options <<<"$(get_tmux_option "@mountain_theme_status_options", "datetime,application,user")"
 
     if [ "$transparent" = "true" ]; then
         right_separator_inverse=$(get_tmux_option "@mountain_theme_transparent_right_separator_inverse" " ") # ''
@@ -66,7 +66,7 @@ main() {
     tmux set-window-option -g window-status-current-format "$(generate_window_string "$active_window_icon" "$zoomed_window_icon" "$pane_synchronized_icon" "$left_separator" "$middle_separator" "$right_separator" "$transparent" "$active_window_title" "${PALLETE[bright_cyan]}" "${PALLETE[normal_cyan]}" "${PALLETE[normal_black]}" "${PALLETE[bg]}")"
 
     ### Create Inactive Window Pane
-    tmux set-window-option -g window-status-format "$(generate_window_string "$inactive_window_icon" "$zoomed_window_icon" "$pane_synchronized_icon" "$left_separator" "$middle_separator" "$right_separator" "$transparent" "$inactive_window_title" "${PALLETE[bright_black]}" "${PALLETE[normal_black]}" "${PALLETE[bright_white]}" "${PALLETE[bg]}")"
+    tmux set-window-option -g window-status-format "$(generate_window_string "$inactive_window_icon" "$zoomed_window_icon" "$pane_synchronized_icon" "$left_separator" "$middle_separator" "$right_separator" "$transparent" "$inactive_window_title" "${PALLETE[bright_black]}" "${PALLETE[bright_white]}" "${PALLETE[normal_black]}" "${PALLETE[bg]}")"
 
     ### Right side
     tmux set-option -g status-right ""
@@ -96,7 +96,7 @@ main() {
             icon_color="${PALLETE["${!icon_color_var}"]}"
             status_text="${!text_var}"
 
-            tmux set-option -ga status-right "$(generate_module_string "$status_icon" "$status_text" "$accent_color" "$icon_color" "$left_separator" "$middle_separator" "$right_separator")"
+            tmux set-option -ga status-right "$(generate_module_string "$status_icon" "$status_text" "$accent_color" "$icon_color" "$left_separator" "$middle_separator" "$right_separator" "${PALLETE[normal_black]}")"
         fi
     done
     tmux set-window-option -g window-status-separator ''

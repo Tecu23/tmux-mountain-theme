@@ -1,14 +1,19 @@
 #!/usr/bin/env bash
 
 get_tmux_option() {
-    local option="$1"
-    local default_value="$2"
-    local option_value="$(tmux show-option -gqv "$option")"
+    local option value default
+    option="$1"
+    default="$2"
+    value="$(tmux show-option -gqv "$option")"
 
-    if [ -z "$option_value" ]; then
-        echo "$default_value"
+    if [ -n "$value" ]; then
+        if [ "$value" = "null" ]; then
+            echo ""
+        else
+            echo "$value"
+        fi
     else
-        echo "$option_value"
+        echo "$default"
     fi
 }
 
@@ -32,9 +37,6 @@ generate_session_string() {
     local left_separator="$2"
     local right_separator="$3"
     local transparent="$4"
-
-    left_separator=""
-    right_separator=""
 
     separator_start="#[bg=default]#{?client_prefix,#[fg=$5],#[fg=$6]}${left_separator:?}"
     text="#{?client_prefix,#[bg=$5],#[bg=$6]}#[fg=$7,bold]${session_icon} #S"
@@ -72,10 +74,10 @@ generate_window_string() {
 
     separator_start="#[bg=default,fg=$9]${left_separator}#[none]"
     number="#[bg=$9]#[fg=${11}]#I "
-    separator_middle="#[bg=${10},fg=${10}]${middle_separator}#[none]"
-    separator_end="#[bg=default,fg=${10}]${right_separator}#[none]"
+    separator_middle="#[bg=${11},fg=${11}]${middle_separator}#[none]"
+    separator_end="#[bg=default,fg=${11}]${right_separator}#[none]"
 
-    echo "${separator_start}${number}${separator_middle}#[fg=${11}]#{?window_zoomed_flag,$2,$1}${active_window_title}#{?pane_synchronized,$3,}${separator_end}#[none]"
+    echo "${separator_start}${number}${separator_middle}#[fg=${10}]#{?window_zoomed_flag,$2,$1}${active_window_title}#{?pane_synchronized,$3,}${separator_end}#[none]"
 }
 
 # Function: generate_module_string()
@@ -90,6 +92,7 @@ generate_window_string() {
 #   $5  (string) - the left separator
 #   $6  (string) - the middle separator
 #   $7  (string) - the right separator
+#   $8  (string) - background color
 #
 # Output:
 #   - return: the module string
@@ -98,6 +101,7 @@ generate_module_string() {
     local status_text=$2
     local accent_color=$3
     local icon_color=$4
+    local bg_color=$8
 
     local left_separator=$5
     local middle_separator=$6
@@ -106,11 +110,11 @@ generate_module_string() {
     local string=""
 
     local separator_icon_start="#[fg=${icon_color},bg=default]${left_separator}#[none]"
-    local separator_icon_end="#[fg=${accent_color},bg=${icon_color}]${middle_separator}#[none]"
-    local separator_end="#[fg=${accent_color},bg=default]${right_separator}#[none]"
+    local separator_icon_end="#[fg=${bg_color},bg=${icon_color}] ${middle_separator}#[none]"
+    local separator_end="#[fg=${bg_color},bg=default]${right_separator}#[none]"
 
-    string=${string}"${separator_icon_start}#[fg=${PALLETE[normal_black]},bg=${icon_color}]${status_icon}${separator_icon_end}"
-    string=${string}"#[fg=${PALLETE[normal_black]},bg=${accent_color}]${status_text}#[none]"
+    string=${string}"${separator_icon_start}#[fg=${bg_color},bg=${icon_color}]${status_icon}${separator_icon_end}"
+    string=${string}"#[fg=${accent_color},bg=${bg_color}]${status_text}#[none]"
     string=${string}${separator_end}
 
     echo "$string"
