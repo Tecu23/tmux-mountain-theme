@@ -35,7 +35,7 @@ main() {
     middle_separator=$(get_tmux_option "@mountain_theme_middle_separator" '█') #
     right_separator=$(get_tmux_option "@mountain_theme_right_separator" "")   # ''thee
 
-    IFS=',' read -ra status_options <<<"$(get_tmux_option "@mountain_status_options", "battery,cpu,director")"
+    IFS=',' read -ra status_options <<<"$(get_tmux_option "@mountain_theme_status_options", "battery,cpu,weather")"
 
     if [ "$transparent" = "true" ]; then
         right_separator_inverse=$(get_tmux_option "@mountain_theme_transparent_right_separator_inverse" " ") # ''
