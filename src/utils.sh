@@ -62,7 +62,7 @@ generate_session_string() {
 #   $12 (string) - background color (when non-transparent)
 #
 # Output:
-#   - return: the session string
+#   - return: the window string
 generate_window_string() {
     local left_separator=$4
     local middle_separator=$5
@@ -76,4 +76,42 @@ generate_window_string() {
     separator_end="#[bg=default,fg=${10}]${right_separator}#[none]"
 
     echo "${separator_start}${number}${separator_middle}#[fg=${11}]#{?window_zoomed_flag,$2,$1}${active_window_title}#{?pane_synchronized,$3,}${separator_end}#[none]"
+}
+
+# Function: generate_module_string()
+# Description:
+#   creates a module string for a selected module
+#
+# Parameters:
+#   $1  (string) - module icon
+#   $2  (string) - module text
+#   $3  (string) - module accent color
+#   $4  (string) - module icon background color
+#   $5  (string) - the left separator
+#   $6  (string) - the middle separator
+#   $7  (string) - the right separator
+#
+# Output:
+#   - return: the module string
+generate_module_string() {
+    local status_icon=$1
+    local status_text=$2
+    local accent_color=$3
+    local icon_color=$4
+
+    local left_separator=$5
+    local middle_separator=$6
+    local right_separator=$7
+
+    local string=""
+
+    local separator_icon_start="#[fg=${icon_color},bg=default]${left_separator}#[none]"
+    local separator_icon_end="#[fg=${accent_color},bg=${icon_color}]${middle_separator}#[none]"
+    local separator_end="#[fg=${accent_color},bg=default]${right_separator}#[none]"
+
+    string=${string}"${separator_icon_start}#[fg=${PALLETE[normal_black]},bg=${icon_color}]${status_icon}${separator_icon_end}"
+    string=${string}"#[fg=${PALLETE[normal_black]},bg=${accent_color}]${status_text}#[none]"
+    string=${string}${separator_end}
+
+    echo "$string"
 }

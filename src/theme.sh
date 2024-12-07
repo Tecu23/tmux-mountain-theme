@@ -16,8 +16,8 @@ main() {
     ### Load Options
     transparent=$(get_tmux_option "@mountain_theme_transparent_bg" "true")
 
-    border_style_active_pane=$(get_tmux_option "@mountain_theme_active_pane_border_style" "${PALLETE[bg]}")
-    border_style_inactive_pane=$(get_tmux_option "@mountain_theme_inactive_pane_border_style" "${PALLETE[bg]}")
+    border_style_active_pane=$(get_tmux_option "@mountain_theme_active_pane_border_style" "${PALLETE[normal_black]}")
+    border_style_inactive_pane=$(get_tmux_option "@mountain_theme_inactive_pane_border_style" "${PALLETE[bright_black]}")
 
     session_icon=$(get_tmux_option "@mountain_theme_session_icon" "")
     active_window_icon=$(get_tmux_option "@mountain_theme_plugin_active_window_icon" " ")
@@ -93,22 +93,9 @@ main() {
             icon_color="${PALLETE["${!icon_color_var}"]}"
             status_text="${!text_var}"
 
-            separator_icon_start="#[fg=${icon_color},bg=default]${left_separator}#[none]"
-            separator_icon_end="#[fg=${accent_color},bg=${icon_color}]${middle_separator}#[none]"
-            separator_end="#[fg=${accent_color},bg=default]${right_separator}#[none]"
-
-            plugin_output_string=""
-
-            plugin_output="#[fg=${PALLETE[normal_black]},bg=${accent_color}]${status_text}#[none]"
-            plugin_icon_output="${separator_icon_start}#[fg=${PALLETE[normal_black]},bg=${icon_color}]${status_icon}${separator_icon_end}"
-
-            plugin_output_string="${plugin_icon_output}${plugin_output} ${separator_end}"
-
-            tmux set-option -ga status-right "$plugin_output_string"
-
+            tmux set-option -ga status-right "$(generate_module_string "$status_icon" "$status_text" "$accent_color" "$icon_color" "$left_separator" "$middle_separator" "$right_separator")"
         fi
     done
-
     tmux set-window-option -g window-status-separator ''
 }
 
