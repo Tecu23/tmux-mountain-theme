@@ -58,9 +58,9 @@ generate_session_string() {
 # Output:
 #   - return: the session string
 generate_window_string() {
-    left_separator=$4
-    transparent=$5
-    active_window_title=$6
+    local left_separator=$4
+    local transparent=$5
+    local active_window_title=$6
 
     if [ "$transparent" = "true" ]; then
         left_separator_inverse=$(get_tmux_option "@theme_transparent_left_separator_inverse" '')
@@ -76,4 +76,25 @@ generate_window_string() {
     fi
 
     echo "${separator_start}#[fg=$9]#I${separator_internal}#[fg=${9}] #{?window_zoomed_flag,$2,$1}${active_window_title}#{?pane_synchronized,$3,}${separator_end}#[none]"
+}
+
+# Function: normalize_percent_len()
+# Description:
+#  normalize the percentage string to always have a length of 5
+#
+# Parameters:
+#   $1 (int) - the current length of the percentage
+#
+# Output:
+#   - return: formatted percentage
+normalize_percent_len() {
+    local max_len=5
+    local percent_len=${#1}
+
+    local diff_len=$max_len-$percent_len
+
+    local left_spaces=$(($((diff_len + 1)) / 2))
+    local right_spaces=$((diff_len / 2))
+
+    printf "%${left_spaces}s%s%${right_spaces}s\n" "" "$1" ""
 }

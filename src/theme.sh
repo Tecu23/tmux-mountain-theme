@@ -31,7 +31,7 @@ main() {
     left_separator=$(get_tmux_option "@mountain_theme_left_separator" '')
     right_separator=$(get_tmux_option "@mountain_theme_right_separator" '')
 
-    IFS=',' read -ra status_options <<<"$(get_tmux_option "@mountain_status_options", "battery")"
+    IFS=',' read -ra status_options <<<"$(get_tmux_option "@mountain_status_options", "battery,cpu")"
 
     if [ "$transparent" = "true" ]; then
         right_separator_inverse=$(get_tmux_option "@mountain_theme_transparent_right_separator_inverse", '')
@@ -95,8 +95,6 @@ main() {
             accent_color="${PALLETE["${!accent_color_var}"]}"
             icon_color="${PALLETE["${!icon_color_var}"]}"
             status_text="${!text_var}"
-
-            echo ${accent_color}
 
             separator_icon_start="#[fg=${icon_color},bg=default]${right_separator}#[none]"
             separator_icon_end="#[fg=${accent_color},bg=${icon_color}]${right_separator}#[none]"
