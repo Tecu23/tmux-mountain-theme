@@ -3,7 +3,11 @@
 # TODO: Add window number position logic
 # TODO: Add option to override the window colors
 # TODO: Add hex color support
+# TODO: Add different configurations in readme
 # TODO: Update README will all these options
+# TODO: Create a docs/configuration.md file to describe how the status in created
+# TODO: Fix left separator reverse
+# TODO: Handle not available plugins, maybe create a way to insert custom modules
 
 # setting the locale, some users have issues with different locales, this enforces the correct one
 export LC_ALL=en_US.UTF-8
