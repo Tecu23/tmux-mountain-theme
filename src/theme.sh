@@ -24,19 +24,19 @@ main() {
     border_style_active_pane=$(get_tmux_option "@mountain_theme_active_pane_border_style" "${PALLETE[normal_black]}")
     border_style_inactive_pane=$(get_tmux_option "@mountain_theme_inactive_pane_border_style" "${PALLETE[bright_black]}")
 
-    session_icon=$(get_tmux_option "@mountain_theme_session_icon" "")
+    session_icon=$(get_tmux_option "@mountain_theme_session_icon" " ")
 
     icon_window_bell=$(get_tmux_option "@mountain_theme_bell_window_icon" "󰂞 ")
     icon_window_mark=$(get_tmux_option "@mountain_theme_mark_window_icon" "󰃀 ")
     icon_window_silent=$(get_tmux_option "@mountain_theme_silent_window_icon" "󰂛 ")
-    icon_window_activity=$(get_tmux_option "@mountain_theme_activity_window_incon" "󰖲 ")
+    icon_window_activity=$(get_tmux_option "@mountain_theme_activity_window_icon" "󰖲 ")
     icon_window_current=$(get_tmux_option "@mountain_theme_current_window_icon" "󰖯 ")
     icon_window_last=$(get_tmux_option "@mountain_theme_last_window_icon" "󰖰 ")
 
     active_window_title=$(get_tmux_option "@mountain_theme_active_window_title" "#W ")
     active_window_number=$(get_tmux_option "@mountain_theme_active_window_number" "#I")
     inactive_window_title=$(get_tmux_option "@mountain_theme_inactive_window_title" "#W ")
-    inactive_window_number=$(get_tmux_option "@mountain_theme_active_window_number" "#I")
+    inactive_window_number=$(get_tmux_option "@mountain_theme_inactive_window_number" "#I")
 
     window_left_separator=$(get_tmux_option "@mountain_theme_window_left_separator" '█')
     window_middle_separator=$(get_tmux_option "@mountain_theme_window_middle_separator" "█")
@@ -49,7 +49,7 @@ main() {
     status_fill=$(get_tmux_option "@mountain_theme_status_fill" "icon")
     status_left_separator=$(get_tmux_option "@mountain_theme_status_left_separator" ' ')
     status_right_separator=$(get_tmux_option "@mountain_theme_status_right_separator" "")
-    status_right_separator_inverse=$(get_tmux_option "@mountain_theme_right_separator_inverse" "true")
+    status_right_separator_inverse=$(get_tmux_option "@mountain_theme_right_separator_inverse" "false")
 
     IFS=',' read -a status_modules <<<$(get_tmux_option "@mountain_theme_status_modules" "datetime,application,user")
 
